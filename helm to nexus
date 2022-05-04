@@ -1,0 +1,31 @@
+pipeline{
+    agent any
+    stages {
+        stage('Create Helm Chart')
+         {
+            steps {
+                sh 'helm create taskpipeline'
+            }
+        }
+        stage('Show Created Chart')
+         {
+            steps {
+                sh 'ls taskpipeline'
+            }
+        }
+        stage('Pacakage The Helm Chart')
+         {
+            steps {
+                sh 'helm package taskpipeline'
+            }
+        }
+        stage('Upload to Nexus Repository')
+         {
+            steps {
+                sh 'curl -u admin:1999 http://localhost:8081/repository/helm_pipeline/ --upload-file taskpipeline-0.1.0.tgz'
+            }
+        }
+ 
+    }
+ 
+}
