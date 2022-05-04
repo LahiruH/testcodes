@@ -1,0 +1,33 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Get Docker Images') {
+            steps {
+                sh 'docker images'
+            }
+        }
+        
+        stage('Tag Docker Images') {
+            steps {
+                sh 'docker image tag dockerla99/myfirstdockerimage dockerla99/myfirstdockerimage:V1'
+            }
+        }
+        stage('Get Docker Images all') {
+            steps {
+                sh 'docker images'
+            }
+        }
+        stage('Login') {
+
+			steps {
+				sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u dockerla99 -p Lha@199979'
+			}
+		}
+        stage('Push Docker Images') {
+            steps {
+                sh 'docker image push dockerla99/myfirstdockerimage:V1'
+            }
+        }
+    }
+}
