@@ -1,0 +1,54 @@
+pipeline { 
+  agent any
+  environment {
+    AWS_DEFAULT_REGION="us-east-1"
+    AWS_ACCESS_KEY_ID     = 'AKIAW55PLYMGLXKF3LXC'
+    AWS_SECRET_ACCESS_KEY = '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'
+  }
+  stages {
+      
+      stage('Show Created Chart')
+         {
+            steps {
+                sh 'ls boostertask'
+            }
+        } 
+     stage('Aws Login') {
+      steps {
+        withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'aws', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+          sh '''
+            aws --version
+               
+          '''
+        }
+      }
+    }
+    stage('Checking Available Clusters') {
+      steps {
+        withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'aws', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+          sh '''   
+            eksctl get cluster --name test1 --region us-east-1 
+          '''
+        }
+      }
+    }
+     stage('Package the helm chart') {
+      steps {
+        withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'aws', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+          sh ''' 
+            helm package boostertask
+          '''
+        }
+      }
+    }
+     stage('Upload the helm chart') {
+      steps {
+        withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'aws', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+          sh '''
+             helm install test-helm boostertask
+          '''
+        }
+      }
+    }
+  }
+}
