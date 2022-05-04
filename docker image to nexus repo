@@ -1,0 +1,37 @@
+pipeline {
+    agent any
+    environment {
+        imageName = "myphpapp"
+        registryCredentials = "nexus"
+        registry = "localhost:8086/"
+        dockerImage = ''
+    }
+    stages {
+        stage('Get Docker Images')
+         {
+            steps {
+                sh 'docker images'
+            }
+        }
+        stage('Tag Docker Images')
+         {
+            steps {
+                sh 'docker image tag dockerla99/myfirstdockerimage localhost:8086/dockerimage:V1'
+            }
+        }
+          stage('Get All Tag Docker Images') {
+            steps {
+                sh 'docker images'
+            }
+        }
+         stage('Uploading to Nexus') {
+            steps{  
+             script {
+             docker.withRegistry( 'http://'+registry, registryCredentials ){
+             sh 'docker image push localhost:8086/dockerimage:V1'
+          } 
+        }
+      }
+    }
+}
+}
